@@ -1,8 +1,9 @@
+#include <Arduino.h>
 
 void setup()
 {
-	Serial1.begin(230400);
 	Serial.begin(9600);
+	Serial1.begin(230400);
 }
 
 void loop()
