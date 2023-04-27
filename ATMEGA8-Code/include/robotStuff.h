@@ -1,6 +1,4 @@
-#define IR_THRESHOLD 100 // value from 0 to 1023, 0 is the most sensitive
-
-#define DEBUG_LED PD7
+#define IR_THRESHOLD_POT PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
 #define RIGHT_MOTOR_ENABLE OCR1B 
@@ -19,9 +17,8 @@
 #define US_1_ECHO PD5
 #define US_2_TRIGGER PD6
 #define US_2_ECHO PD7
-#define US_3_TRIGGER PB0
-#define US_3_ECHO PB6
-#define US_4_TRIGGER PB7
+#define US_3_TRIGGER PB6
+#define US_3_ECHO PB7
 
 void setup(void);
 
