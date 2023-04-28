@@ -4,6 +4,7 @@
 #include <robotStuff.h>
 #include <utility.h>
 
+
 void setup(void){
     DDRD |= 0xFF; // set all pins of PORTD as output
     DDRB |= 0xFF; // set all pins of PORTB as output
@@ -22,48 +23,84 @@ void setup(void){
 
 }
 
-char IR_triggered(IR ir_sensor){
+
+unsigned char IR_triggered(IR ir_sensor){
     unsigned int result = get_ADC(ir_sensor);
     unsigned int IR_THRESHOLD = get_ADC(IR_THRESHOLD_POT);
     return (result > IR_THRESHOLD) ? 1 : 0;
 }
 
-void setSpeed(unsigned int left_speed, unsigned int right_speed){
+
+//create an array of arrays of unsigned chars
+unsigned char US_pins[3][2] = {
+    {US_1_TRIGGER, US_1_ECHO},
+    {US_2_TRIGGER, US_2_ECHO},
+    {US_3_TRIGGER, US_3_ECHO},
+};
+unsigned int get_distance(US sensor){
+    unsigned char trigger = US_pins[sensor][0]; 
+    unsigned char echo = US_pins[sensor][1];
+    unsigned int distance = 0;
+    unsigned int time = 0;
+
+    // send a 10us pulse to the trigger pin
+    digitalWrite(trigger, DDRD, 0xFF);
+    _delay_us(10);
+    digitalWrite(trigger, DDRD, 0x00);
+
+    // wait for the echo pin to go high
+    while(!digitalRead(echo, DDRD));
+
+    // get the time
+    int currentTime_us = micros();
+    while(digitalRead(echo, DDRD));
+    time = micros() - currentTime_us;
+
+    // convert time to distance
+    distance = time / 58; // cm
+    return distance;
+}
+
+
+void set_speed(unsigned int left_speed, unsigned int right_speed){
     _left_motor_speed = left_speed;
     _right_motor_speed = right_speed;
 }
 
-void simpleMove(char direction){
-    switch(direction){
+
+void simple_move(DIRECTION dir){
+    switch(dir){
         case FORWARD:
-            PORTD |= (1<<LEFT_MOTOR_I1);
-            PORTD &= ~(1<<LEFT_MOTOR_I2);
-            PORTD |= (1<<RIGHT_MOTOR_I1);
-            PORTD &= ~(1<<RIGHT_MOTOR_I2);
+            digitalWrite(LEFT_MOTOR_I1, DDRD, 0xFF); 
+            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0xFF);
+            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
             break;
         case BACKWARD:
-            PORTD &= ~(1<<LEFT_MOTOR_I1);
-            PORTD |= (1<<LEFT_MOTOR_I2);
-            PORTD &= ~(1<<RIGHT_MOTOR_I1);
-            PORTD |= (1<<RIGHT_MOTOR_I2);
+            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
+            digitalWrite(LEFT_MOTOR_I2, DDRD, 0xFF);
+            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0xFF); 
             break;
         case LEFT:
-            PORTD &= ~(1<<LEFT_MOTOR_I1);
-            PORTD |= (1<<LEFT_MOTOR_I2);
-            PORTD |= (1<<RIGHT_MOTOR_I1);
-            PORTD &= ~(1<<RIGHT_MOTOR_I2);
+            digitalWrite(LEFT_MOTOR_I1, DDRD, 0xFF); 
+            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0xFF); 
             break;
         case RIGHT:
-            PORTD |= (1<<LEFT_MOTOR_I1);
-            PORTD &= ~(1<<LEFT_MOTOR_I2);
-            PORTD &= ~(1<<RIGHT_MOTOR_I1);
-            PORTD |= (1<<RIGHT_MOTOR_I2);
+            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
+            digitalWrite(LEFT_MOTOR_I2, DDRD, 0xFF);
+            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0xFF);
+            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
             break;
         case STOP:
-            PORTD |= (1<<LEFT_MOTOR_I1);
-            PORTD |= (1<<LEFT_MOTOR_I2);
-            PORTD |= (1<<RIGHT_MOTOR_I1);
-            PORTD |= (1<<RIGHT_MOTOR_I2);
+            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
+            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
+            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
+            break;
+        default:
             break;
     }
 
@@ -73,7 +110,8 @@ void simpleMove(char direction){
 
 }
 
-void arcMove(int ccwTurnSpeed, int forwardSpeed) {
+
+void arc_move(int ccwTurnSpeed, int forwardSpeed) {
     int leftSpeed, rightSpeed;
     float scale;
 
@@ -82,7 +120,7 @@ void arcMove(int ccwTurnSpeed, int forwardSpeed) {
     forwardSpeed = (forwardSpeed > 255) ? 255 : forwardSpeed;
     forwardSpeed = (forwardSpeed < -255) ? -255 : forwardSpeed;
 
-    char direction = (forwardSpeed >= 0) ? FORWARD : BACKWARD;
+    unsigned char direction = (forwardSpeed >= 0) ? FORWARD : BACKWARD;
 
     // Calculate normalized speed if the sum exceeds 255
     if (abs(forwardSpeed) + abs(ccwTurnSpeed) > 255) {
@@ -97,6 +135,6 @@ void arcMove(int ccwTurnSpeed, int forwardSpeed) {
     leftSpeed = (leftSpeed > 255) ? 255 : (leftSpeed < -255) ? -255 : leftSpeed;
     rightSpeed = (rightSpeed > 255) ? 255 : (rightSpeed < -255) ? -255 : rightSpeed;
 
-    setSpeed(leftSpeed, rightSpeed);
-    simpleMove(direction);
+    set_speed(leftSpeed, rightSpeed);
+    simple_move(direction);
 }

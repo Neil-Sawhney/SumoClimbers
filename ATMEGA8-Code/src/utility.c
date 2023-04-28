@@ -3,6 +3,7 @@
 
 #include <utility.h>
 
+
 unsigned int get_ADC( unsigned char channel){
 
     ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
@@ -16,6 +17,29 @@ unsigned int get_ADC( unsigned char channel){
 
 }
 
+
+unsigned char digitalRead(unsigned char pin, unsigned char port){
+
+    return (port & (1<<pin)) ? 1 : 0;
+
+}
+
+
+void digitalWrite(unsigned char pin, unsigned char port, unsigned char value){
+    
+        if(value == 1){
+    
+            port |= (1<<pin);
+    
+        }else{
+    
+            port &= ~(1<<pin);
+    
+        }
+    
+    }
+
+
 void delay_ms(int millisec){
 
     for(int i = 0; i < millisec; i++){
@@ -25,8 +49,19 @@ void delay_ms(int millisec){
     }
 }
 
+
 int abs(int num){
 
     return (num < 0) ? -num : num;
+
+}
+
+
+int micros(void){
+
+    int time = 0;
+    time = TCNT1;
+    time = time * 4;
+    return time;
 
 }
