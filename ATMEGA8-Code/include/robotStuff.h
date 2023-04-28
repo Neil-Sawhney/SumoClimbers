@@ -25,19 +25,32 @@
 extern unsigned int _left_motor_speed;
 extern unsigned int _right_motor_speed;
 
+
 void setup(void);
+
 
 // Accpets an IR enum and returns 1 if the IR sensor is triggered
 typedef enum {
-    IR1 = 0,
-    IR2 = 1,
-    IR3 = 2,
-    IR4 = 3,
+    IR1 = IR_1,
+    IR2 = IR_2,
+    IR3 = IR_3,
+    IR4 = IR_4,
 } IR;
-char IR_triggered(IR);
+unsigned char IR_triggered(IR);
+
+
+// returns the distance in cm from the given ultrasonic sensor
+typedef enum {
+    US1 = 0,
+    US2 = 1,
+    US3 = 2,
+} US;
+unsigned int get_distance(US sensor);
+
 
 // sets the global variables left_motor_speed and right_motor_speed to the given values
-void setSpeed(unsigned int left_speed, unsigned int right_speed);
+void set_speed(unsigned int left_speed, unsigned int right_speed);
+
 
 // moves both wheels at the same speed. direction is defined by the DIRECTION enum, speed is from 0 to 255
 typedef enum {
@@ -47,9 +60,10 @@ typedef enum {
     RIGHT = 3,
     STOP = 4,
 } DIRECTION;
-void simpleMove(char direction);
+void simple_move(DIRECTION dir);
+
 
 //moves the robot forward or backward at the given speed, with the given turn speed.
 //ccwTurnSpeed is from -255 to 255, with negative values turning the robot clockwise
 // forwardSpeed is from -255 to 255, with negative values moving the robot backward
-void arcMove(int ccwTurnSpeed, int fowardSpeed);
+void arc_move(int ccwTurnSpeed, int fowardSpeed);
