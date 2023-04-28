@@ -1,3 +1,5 @@
+#pragma once
+
 #define IR_THRESHOLD_POT PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
@@ -20,6 +22,9 @@
 #define US_3_TRIGGER PB6
 #define US_3_ECHO PB7
 
+extern unsigned int _left_motor_speed;
+extern unsigned int _right_motor_speed;
+
 void setup(void);
 
 // Accpets an IR enum and returns 1 if the IR sensor is triggered
@@ -31,7 +36,10 @@ typedef enum {
 } IR;
 char IR_triggered(IR);
 
-// Accepts a direction and a speed and moves the robot accordingly, speed is from 0 to 255
+// sets the global variables left_motor_speed and right_motor_speed to the given values
+void setSpeed(unsigned int left_speed, unsigned int right_speed);
+
+// moves both wheels at the same speed. direction is defined by the DIRECTION enum, speed is from 0 to 255
 typedef enum {
     FORWARD = 0,
     BACKWARD = 1,
@@ -39,4 +47,9 @@ typedef enum {
     RIGHT = 3,
     STOP = 4,
 } DIRECTION;
-void move(char direction, int speed);
+void simpleMove(char direction);
+
+//moves the robot forward or backward at the given speed, with the given turn speed.
+//ccwTurnSpeed is from -255 to 255, with negative values turning the robot clockwise
+// forwardSpeed is from -255 to 255, with negative values moving the robot backward
+void arcMove(int ccwTurnSpeed, int fowardSpeed);

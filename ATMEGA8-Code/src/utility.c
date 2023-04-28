@@ -25,3 +25,8 @@ void delay_ms(int millisec){
     }
 }
 
+int abs(int num){
+
+    return (num < 0) ? -num : num;
+
+}
