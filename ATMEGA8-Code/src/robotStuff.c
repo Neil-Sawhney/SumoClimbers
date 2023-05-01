@@ -8,16 +8,14 @@
 void setup(void){
     DDRD |= 0xFF; // set all pins of PORTD as output
     DDRB |= 0xFF; // set all pins of PORTB as output
-    PORTB |= (1<<PB1);
-    PORTB |= (1<<PB2);
 
     // start pwm on enable pins
-    TCCR1A |= (1<<COM1A1)|(1<<COM1B1)|(1<<WGM10);
-    TCCR1B |= (1<<CS11)|(1<<WGM12);
+    TCCR1A |= (1<<WGM20);
+    TCCR1B |= (1<<WGM20);
 
     // set initial motor speed to 0
-    int _left_motor_speed = 0;
-    int _right_motor_speed = 0;
+    _left_motor_speed = 0;
+    _right_motor_speed = 0;
     LEFT_MOTOR_ENABLE = _left_motor_speed;
     RIGHT_MOTOR_ENABLE = _right_motor_speed;
 

@@ -22,8 +22,8 @@
 #define US_3_TRIGGER PB6
 #define US_3_ECHO PB7
 
-extern unsigned int _left_motor_speed;
-extern unsigned int _right_motor_speed;
+unsigned int _left_motor_speed;
+unsigned int _right_motor_speed;
 
 
 // sets pins to input or output and other initializations
