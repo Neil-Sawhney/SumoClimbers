@@ -1,8 +1,8 @@
 #include <avr/io.h>
+#include <utility.h>
+#include <robotStuff.h>
 #include <util/delay.h>
 
-#include <robotStuff.h>
-#include <utility.h>
 
 
 void setup(void){
@@ -10,8 +10,8 @@ void setup(void){
     DDRB |= 0xFF; // set all pins of PORTB as output
 
     // start pwm on enable pins
-    TCCR1A |= (1<<WGM20);
-    TCCR1B |= (1<<WGM20);
+    // TCCR1A |= (1<<WGM20);
+    // TCCR1B |= (1<<WGM20);
 
     // set initial motor speed to 0
     _left_motor_speed = 0;
@@ -24,7 +24,6 @@ void setup(void){
 
 unsigned char IR_triggered(IR ir_sensor){
     unsigned int result = get_ADC(ir_sensor);
-    unsigned int IR_THRESHOLD = get_ADC(IR_THRESHOLD_POT);
     return (result > IR_THRESHOLD) ? 1 : 0;
 }
 
@@ -67,44 +66,44 @@ void set_speed(unsigned int left_speed, unsigned int right_speed){
 
 
 void simple_move(DIRECTION dir){
+    // pwm for enable pins
+    LEFT_MOTOR_ENABLE = _left_motor_speed;
+    RIGHT_MOTOR_ENABLE = _right_motor_speed;
+
     switch(dir){
         case FORWARD:
-            digitalWrite(LEFT_MOTOR_I1, DDRD, 0xFF); 
-            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0xFF);
-            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I1,  0xFF); 
+            digitalWritePORTD(LEFT_MOTOR_I2,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I1,  0xFF);
+            digitalWritePORTD(RIGHT_MOTOR_I2,  0x00); 
             break;
         case BACKWARD:
-            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
-            digitalWrite(LEFT_MOTOR_I2, DDRD, 0xFF);
-            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0xFF); 
+            digitalWritePORTD(LEFT_MOTOR_I1,  0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I2,  0xFF);
+            digitalWritePORTD(RIGHT_MOTOR_I1,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I2,  0xFF); 
             break;
         case LEFT:
-            digitalWrite(LEFT_MOTOR_I1, DDRD, 0xFF); 
-            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0xFF); 
+            digitalWritePORTD(LEFT_MOTOR_I1,  0xFF); 
+            digitalWritePORTD(LEFT_MOTOR_I2,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I1,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I2,  0xFF); 
             break;
         case RIGHT:
-            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
-            digitalWrite(LEFT_MOTOR_I2, DDRD, 0xFF);
-            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0xFF);
-            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I1,  0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I2,  0xFF);
+            digitalWritePORTD(RIGHT_MOTOR_I1,  0xFF);
+            digitalWritePORTD(RIGHT_MOTOR_I2,  0x00); 
             break;
         case STOP:
-            digitalWrite(LEFT_MOTOR_I1, DDRD, 0x00); 
-            digitalWrite(LEFT_MOTOR_I2, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I1, DDRD, 0x00);
-            digitalWrite(RIGHT_MOTOR_I2, DDRD, 0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I1,  0x00); 
+            digitalWritePORTD(LEFT_MOTOR_I2,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I1,  0x00);
+            digitalWritePORTD(RIGHT_MOTOR_I2,  0x00); 
             break;
         default:
             break;
     }
-
-    // pwm for enable pins
-    LEFT_MOTOR_ENABLE = _left_motor_speed;
-    RIGHT_MOTOR_ENABLE = _right_motor_speed;
 
 }
 

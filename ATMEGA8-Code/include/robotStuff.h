@@ -1,6 +1,6 @@
 #pragma once
 
-#define IR_THRESHOLD_POT PB7
+#define IR_THRESHOLD 45
 
 #define LEFT_MOTOR_ENABLE OCR1A
 #define RIGHT_MOTOR_ENABLE OCR1B 

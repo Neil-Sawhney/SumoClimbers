@@ -1,7 +1,7 @@
 #include <avr/io.h>
+#include <utility.h>
 #include <util/delay.h>
 
-#include <utility.h>
 
 
 unsigned int get_ADC( unsigned char channel){
@@ -18,35 +18,25 @@ unsigned int get_ADC( unsigned char channel){
 }
 
 
-unsigned char digitalRead(unsigned char pin, unsigned char port){
+unsigned char digitalReadPORTC(unsigned char pin){
 
-    return (port & (1<<pin)) ? 1 : 0;
+    return (PINC & (1<<pin)) ? 1 : 0;
 
 }
 
 
-void digitalWrite(unsigned char pin, unsigned char port, unsigned char value){
-    
-        if(value == 1){
-    
-            port |= (1<<pin);
-    
-        }else{
-    
-            port &= ~(1<<pin);
-    
-        }
-    
-    }
+void digitalWritePORTD(unsigned char pin, unsigned char value){
 
+    if(value){
 
-void delay_ms(int millisec){
+        PORTD |= (1<<pin);
 
-    for(int i = 0; i < millisec; i++){
+    }else{
 
-        _delay_ms(1);
+        PORTD &= ~(1<<pin);
 
     }
+
 }
 
 
@@ -56,6 +46,16 @@ int abs(int num){
 
 }
 
+
+void delay_ms(int ms){
+
+    for(int i = 0; i < ms; i++){
+
+        _delay_ms(1);
+
+    }
+
+}
 
 int micros(void){
 
