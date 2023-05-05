@@ -5,6 +5,7 @@
 
 
 
+
 void setup(void){
     DDRD |= 0xFF; // set all pins of PORTD as output
     DDRB |= 0xFF; // set all pins of PORTB as output

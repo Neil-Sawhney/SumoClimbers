@@ -4,6 +4,7 @@
 
 
 
+
 unsigned int get_ADC( unsigned char channel){
 
     ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
