@@ -19,22 +19,22 @@ unsigned int get_ADC( unsigned char channel){
 }
 
 
-unsigned char digitalReadPORTC(unsigned char pin){
+unsigned char digitalRead(unsigned char pin, volatile uint8_t port){
 
-    return (PINC & (1<<pin)) ? 1 : 0;
+    return (port & (1<<pin)) ? 1 : 0;
 
 }
 
 
-void digitalWritePORTD(unsigned char pin, unsigned char value){
+void digitalWrite(unsigned char pin, volatile uint8_t port, unsigned char value){
 
     if(value){
 
-        PORTD |= (1<<pin);
+        port |= (1<<pin);
 
     }else{
 
-        PORTD &= ~(1<<pin);
+        port &= ~(1<<pin);
 
     }
 
@@ -57,6 +57,7 @@ void delay_ms(int ms){
     }
 
 }
+
 
 int micros(void){
 

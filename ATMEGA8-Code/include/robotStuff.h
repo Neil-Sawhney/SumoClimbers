@@ -1,6 +1,7 @@
 #pragma once
 
 #define IR_THRESHOLD 45
+#define TEST_LED PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
 #define RIGHT_MOTOR_ENABLE OCR1B 
@@ -40,6 +41,10 @@ typedef enum {
 unsigned char IR_triggered(IR);
 
 
+// returns an array of size 4 where index IR1 is 1 if IR1 is triggered, else 0, etc.
+unsigned char* checkIRs(void);
+
+
 // returns the distance in cm from the given ultrasonic sensor
 typedef enum {
     US1 = 0,
@@ -61,7 +66,19 @@ typedef enum {
     RIGHT = 3,
     STOP = 4,
 } DIRECTION;
-void simple_move(DIRECTION dir);
+void move(DIRECTION dir);
+
+
+// turns the robot by the given number of degrees. positive values turn the robot counterclockwise
+void turn(int degrees);
+
+
+// moves the robot forward or backward the given distance in cm. negative values move the robot backward
+void move_distance(int distance);
+
+
+// just calls move(STOP) with a delay to allow the robot to stop
+void brake(void);
 
 
 //moves the robot forward or backward at the given speed, with the given turn speed.
