@@ -26,17 +26,6 @@ unsigned char IR_triggered(IR ir_sensor)
     return (result > IR_THRESHOLD) ? 1 : 0;
 }
 
-unsigned char* checkIRs(void)
-{
-    static unsigned char results[4] = {0, 0, 0, 0};
-    for (int i = 0; i < 4; i++)
-    {
-        results[i] = IR_triggered(i);
-    }
-
-    return results;
-}
-
 // create an array of arrays of unsigned chars
 unsigned char US_pins[3][2] = {
     {US_1_TRIGGER, US_1_ECHO},
@@ -199,4 +188,52 @@ void arc_move(int ccwTurnSpeed, int forwardSpeed)
 void led(unsigned char value)
 {
     digitalWrite(TEST_LED, &PORTB, value);
+}
+
+unsigned char check_leaving(void)
+{
+    if (IR_triggered(IR1))
+    {
+        led(1);
+        brake();
+        move(BACKWARD);
+        delay_ms(700);
+        brake();
+        move(LEFT);
+        delay_ms(700);
+        brake();
+        return 1;
+    }
+    if (IR_triggered(IR2))
+    {
+        led(1);
+        brake();
+        move(BACKWARD);
+        delay_ms(700);
+        brake();
+        move(RIGHT);
+        delay_ms(700);
+        brake();
+        return 1;
+    }
+    if (IR_triggered(IR3))
+    {
+        led(1);
+        set_speed(255, 255);
+        move(RIGHT);
+        delay_ms(700);
+        return 1;
+    }
+    if (IR_triggered(IR4))
+    {
+        led(1);
+        set_speed(255, 255);
+        move(LEFT);
+        delay_ms(700);
+        return 1;
+    }
+    led(0);
+    return 0;
+    
+    
 }

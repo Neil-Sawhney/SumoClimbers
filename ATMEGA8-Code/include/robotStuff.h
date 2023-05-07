@@ -1,6 +1,6 @@
 #pragma once
 
-#define IR_THRESHOLD 10 // the lower the number, the more sensitive the IR sensors are
+#define IR_THRESHOLD 40 // the lower the number, the more sensitive the IR sensors are
 #define TEST_LED PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
@@ -39,10 +39,6 @@ typedef enum {
     IR4 = IR_4,
 } IR;
 unsigned char IR_triggered(IR);
-
-
-// returns an array of size 4 where index IR1 is 1 if IR1 is triggered, else 0, etc.
-unsigned char* checkIRs(void);
 
 
 // returns the distance in cm from the given ultrasonic sensor
@@ -88,3 +84,12 @@ void arc_move(int ccwTurnSpeed, int fowardSpeed);
 
 // turns the led on or off
 void led(unsigned char state);
+
+// this function should be called very frequently to check if we're leaving the arena
+// checks all the IR sensors, if any are triggered, stop, the turn back into the arena depending on which sensor was triggered.
+// if IR1 is triggered turn left by 135 degrees
+// if IR2 is triggered turn right by 135 degrees
+// if IR3 is triggered turn left by 60 degrees
+// if IR4 is triggered turn right by 60 degrees
+// returns 1 if one of the IR sensors was triggered, 0 otherwise
+unsigned char check_leaving(void);
