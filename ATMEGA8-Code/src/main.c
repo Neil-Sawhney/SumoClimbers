@@ -7,26 +7,34 @@ int main()
 {
     // initialize the robot
     setup();
+    set_speed(80, 80);
 
-    digitalWrite(TEST_LED, PORTB, 1);
+    move(FORWARD);
+    delay_ms(1000);
+    brake();
 
-    // set_speed(255, 255);
+    while (1)
+    {
+    }
+    // set_speed(250, 250);
+    // while(1){
+    //     move(FORWARD); 
+    //     delay_ms(1000);
+    //     brake();
+    //     // if (IR_triggered(IR_1))
+    //     // {
 
-    // while (1)
-    // {
-    //     if (IR_triggered(IR_1))
-    //     {
-               digitalWrite(TEST_LED, PORTB, 1);
-
-    //         brake();
-    //         move_distance(-10);
-    //         turn(100);
-    //     }
-    //     else
-    //     {
-               digitalWrite(TEST_LED, PORTB, 1);
-    //         move(FORWARD);
-    //     }
+    //     //     led(1);
+    //     //     brake();
+    //     //     move(BACKWARD);
+    //     //     delay_ms(180);
+    //     //     brake();
+    //     // }
+    //     // else
+    //     // {
+    //     //     led(0);
+    //     //     // move(FORWARD);
+    //     // }
     // }
     return 0; // the program executed successfully
 }

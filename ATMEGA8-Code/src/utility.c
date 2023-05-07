@@ -19,22 +19,22 @@ unsigned int get_ADC( unsigned char channel){
 }
 
 
-unsigned char digitalRead(unsigned char pin, volatile uint8_t port){
+unsigned char digitalRead(unsigned char pin, volatile uint8_t *port){
 
-    return (port & (1<<pin)) ? 1 : 0;
+    return (*port & (1<<pin)) ? 1 : 0;
 
 }
 
 
-void digitalWrite(unsigned char pin, volatile uint8_t port, unsigned char value){
+void digitalWrite(unsigned char pin, volatile uint8_t *port, unsigned char value){
 
     if(value){
 
-        port |= (1<<pin);
+        *port |= (1<<pin);
 
     }else{
 
-        port &= ~(1<<pin);
+        *port &= ~(1<<pin);
 
     }
 

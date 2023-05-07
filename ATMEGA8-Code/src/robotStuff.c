@@ -9,8 +9,9 @@ void setup(void)
     DDRB |= 0xFF; // set all pins of PORTB as output
 
     // start pwm on enable pins
-    // TCCR1A |= (1<<WGM20);
-    // TCCR1B |= (1<<WGM20);
+    TCCR1A |= (1 << COM1A1) | (1 << COM1B1);
+    TCCR1A |= (1 << WGM11) | (1 << WGM10);
+    TCCR1B |= (1 << CS11) | (1 << WGM12);
 
     // set initial motor speed to 0
     _left_motor_speed = 0;
@@ -50,17 +51,17 @@ unsigned int get_distance(US sensor)
     unsigned int time = 0;
 
     // send a 10us pulse to the trigger pin
-    digitalWrite(trigger, PORTD, 0xFF);
+    digitalWrite(trigger, &PORTD, 0xFF);
     _delay_us(10);
-    digitalWrite(trigger, PORTD, 0x00);
+    digitalWrite(trigger, &PORTD, 0x00);
 
     // wait for the echo pin to go high
-    while (!digitalRead(echo, DDRD))
+    while (!digitalRead(echo, &PORTD))
         ;
 
     // get the time
     int currentTime_us = micros();
-    while (digitalRead(echo, DDRD))
+    while (digitalRead(echo, &PORTD))
         ;
     time = micros() - currentTime_us;
 
@@ -83,35 +84,35 @@ void move(DIRECTION dir)
 
     switch (dir)
     {
-    case FORWARD:
-        digitalWrite(LEFT_MOTOR_I1, PORTD, 0xFF);
-        digitalWrite(LEFT_MOTOR_I2, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I1, PORTD, 0xFF);
-        digitalWrite(RIGHT_MOTOR_I2, PORTD, 0x00);
-        break;
     case BACKWARD:
-        digitalWrite(LEFT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(LEFT_MOTOR_I2, PORTD, 0xFF);
-        digitalWrite(RIGHT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I2, PORTD, 0xFF);
+        digitalWrite(LEFT_MOTOR_I1, &PORTD, 0xFF);
+        digitalWrite(LEFT_MOTOR_I2, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I1, &PORTD, 0xFF);
+        digitalWrite(RIGHT_MOTOR_I2, &PORTD, 0x00);
         break;
-    case LEFT:
-        digitalWrite(LEFT_MOTOR_I1, PORTD, 0xFF);
-        digitalWrite(LEFT_MOTOR_I2, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I2, PORTD, 0xFF);
+    case FORWARD:
+        digitalWrite(LEFT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(LEFT_MOTOR_I2, &PORTD, 0xFF);
+        digitalWrite(RIGHT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I2, &PORTD, 0xFF);
         break;
     case RIGHT:
-        digitalWrite(LEFT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(LEFT_MOTOR_I2, PORTD, 0xFF);
-        digitalWrite(RIGHT_MOTOR_I1, PORTD, 0xFF);
-        digitalWrite(RIGHT_MOTOR_I2, PORTD, 0x00);
+        digitalWrite(LEFT_MOTOR_I1, &PORTD, 0xFF);
+        digitalWrite(LEFT_MOTOR_I2, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I2, &PORTD, 0xFF);
+        break;
+    case LEFT:
+        digitalWrite(LEFT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(LEFT_MOTOR_I2, &PORTD, 0xFF);
+        digitalWrite(RIGHT_MOTOR_I1, &PORTD, 0xFF);
+        digitalWrite(RIGHT_MOTOR_I2, &PORTD, 0x00);
         break;
     case STOP:
-        digitalWrite(LEFT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(LEFT_MOTOR_I2, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I1, PORTD, 0x00);
-        digitalWrite(RIGHT_MOTOR_I2, PORTD, 0x00);
+        digitalWrite(LEFT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(LEFT_MOTOR_I2, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I1, &PORTD, 0x00);
+        digitalWrite(RIGHT_MOTOR_I2, &PORTD, 0x00);
         break;
     default:
         break;
@@ -193,4 +194,9 @@ void arc_move(int ccwTurnSpeed, int forwardSpeed)
 
     set_speed(leftSpeed, rightSpeed);
     move(direction);
+}
+
+void led(unsigned char value)
+{
+    digitalWrite(TEST_LED, &PORTB, value);
 }

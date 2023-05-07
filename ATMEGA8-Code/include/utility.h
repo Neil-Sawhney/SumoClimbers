@@ -6,11 +6,11 @@ unsigned int get_ADC( unsigned char);
 
 
 // returns the value of the given digital pin on PORTC
-unsigned char digitalRead(unsigned char pin, volatile uint8_t port);
+unsigned char digitalRead(unsigned char pin, volatile uint8_t *port);
 
 
 // takes a pin such as PD7, and a value such as 1 or 0
-void digitalWrite(unsigned char pin, volatile uint8_t port, unsigned char value);
+void digitalWrite(unsigned char pin, volatile uint8_t *port, unsigned char value);
 
 
 // returns absolute value of num

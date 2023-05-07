@@ -1,6 +1,6 @@
 #pragma once
 
-#define IR_THRESHOLD 45
+#define IR_THRESHOLD 10 // the lower the number, the more sensitive the IR sensors are
 #define TEST_LED PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
@@ -85,3 +85,6 @@ void brake(void);
 //ccwTurnSpeed is from -255 to 255, with negative values turning the robot clockwise
 // forwardSpeed is from -255 to 255, with negative values moving the robot backward
 void arc_move(int ccwTurnSpeed, int fowardSpeed);
+
+// turns the led on or off
+void led(unsigned char state);
