@@ -7,13 +7,14 @@ int main()
 {
     // initialize the robot
     setup();
-    set_speed(50, 50);
+
+    set_speed(80, 80);
     move(FORWARD);
-    // while (1) {
-    //     if(robot_leaving()){
-    //         move(FORWARD);
-    //     }
-    // }
+    while (1) {
+        if(robot_leaving()){
+            move(FORWARD);
+        }
+    }
 
     return 0; // the program executed successfully
 }

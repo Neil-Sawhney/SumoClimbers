@@ -61,16 +61,16 @@ void delay_ms(int ms){
 }
 
 
-ISR(TIMER1_COMPA_vect)
+ISR(TIMER2_COMP_vect)
 {
-  timer1_millis++;
+  timer2_millis++;
 }
 
 void init_millis(unsigned long f_cpu)
 {
   unsigned long ctc_match_overflow;
 
-  ctc_match_overflow = ((f_cpu / 1000) / 8); //when timer1 is this value, 1ms has passed
+  ctc_match_overflow = ((f_cpu / 1000) / 64); //when timer1 is this value, 1ms has passed
 
   // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 64)
   TCCR2 |= (1 << WGM21);
@@ -78,6 +78,7 @@ void init_millis(unsigned long f_cpu)
 
   // Set clock divisor to 64
   TCCR2 |= (1 << CS22);
+  TCCR2 &= ~((1 << CS21) | (1 << CS20));
 
   // Set compare match value
   OCR2 = ctc_match_overflow;
@@ -94,7 +95,7 @@ unsigned long millis (void)
 
   // Ensure this cannot be disrupted
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
-    millis_return = timer1_millis;
+    millis_return = timer2_millis;
   }
   return millis_return;
 }
