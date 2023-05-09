@@ -14,7 +14,6 @@ void setup(void)
     TCCR1A |= (1 << WGM11) | (1 << WGM10);
     TCCR1B |= (1 << CS11) | (1 << WGM12);
 
-
     // set initial motor speed to 0
     set_speed(0, 0);
 

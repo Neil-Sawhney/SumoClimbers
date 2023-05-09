@@ -7,7 +7,7 @@ int main()
 {
     // initialize the robot
     setup();
-    set_speed(0, 0);
+    set_speed(50, 50);
     move(FORWARD);
     // while (1) {
     //     if(robot_leaving()){

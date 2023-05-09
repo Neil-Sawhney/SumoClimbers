@@ -72,19 +72,18 @@ void init_millis(unsigned long f_cpu)
 
   ctc_match_overflow = ((f_cpu / 1000) / 8); //when timer1 is this value, 1ms has passed
 
-  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
-  TCCR1A |= (1 << WGM11);
-  TCCR1B |= (1 << WGM13) | (1 << WGM12);
+  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 64)
+  TCCR2 |= (1 << WGM21);
+  TCCR2 &= ~(1 << WGM20);
 
-  // Set clock divisor to 8
-  TCCR1B |= (1 << CS11);
+  // Set clock divisor to 64
+  TCCR2 |= (1 << CS22);
 
-  // high byte first, then low byte
-  OCR1AH = (ctc_match_overflow >> 8);
-  OCR1AL = ctc_match_overflow;
+  // Set compare match value
+  OCR2 = ctc_match_overflow;
 
   // Enable the compare match interrupt
-  TIMSK |= (1 << OCIE1A);
+  TIMSK |= (1 << OCIE2);
 
   //REMEMBER TO ENABLE GLOBAL INTERRUPTS AFTER THIS WITH sei(); !!!
 }
