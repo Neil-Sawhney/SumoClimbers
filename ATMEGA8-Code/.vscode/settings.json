@@ -1,6 +1,7 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "delay.h": "c"
+        "delay.h": "c",
+        "io.h": "c"
     }
 }

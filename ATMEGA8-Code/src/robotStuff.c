@@ -14,14 +14,16 @@ void setup(void)
     TCCR1A |= (1 << WGM11) | (1 << WGM10);
     TCCR1B |= (1 << CS11) | (1 << WGM12);
 
+
+    // set initial motor speed to 0
+    set_speed(0, 0);
+
+
     init_millis(F_CPU);
     sei();
 
     // set the threshold using the potentiometer
     set_threshold();
-
-    // set initial motor speed to 0
-    set_speed(0, 0);
 
 }
 
@@ -195,25 +197,33 @@ void led(unsigned char value)
     digitalWrite(TEST_LED, &PORTB, value);
 }
 
-unsigned char check_leaving(void)
+unsigned char robot_leaving(void)
 {
-    if (IR_triggered(IR1) || IR_triggered(IR2))
+    if (IR_triggered(IR1) || IR_triggered(IR4))
     {
         led(ON);
         brake();
-        set_speed(1023, 1023);
+        // set_speed(1023, 1023);
+        //TODO: uncomment these to go full speed
         move(LEFT);
         delay_ms(700);
+        move(FORWARD);
+        delay_ms(1000);
         brake();
         led(OFF);
         return 1;
     }
-    if (IR_triggered(IR3) || IR_triggered(IR4))
+    if (IR_triggered(IR2) || IR_triggered(IR3))
     {
         led(ON);
-        set_speed(255, 255);
+        brake();
+        // set_speed(1023, 1023);
+        //TODO: uncomment these to go full speed
         move(RIGHT);
         delay_ms(700);
+        move(FORWARD);
+        delay_ms(1000);
+        brake();
         led(OFF);
         return 1;
     }
@@ -225,8 +235,10 @@ unsigned char check_leaving(void)
 unsigned char set_threshold(void)
 {
     // get ADC from the potentiometer
-    _threshold = get_ADC(THRESHOLD);
-    if (_threshold < 1)
+    // scale the result so that fully ccw is MIN_THRESHOLD and fully cw is MAX_THRESHOLD
+    _threshold = get_ADC(THRESHOLD) * (MAX_THRESHOLD - MIN_THRESHOLD) / 1023 + MIN_THRESHOLD;
+
+    if (_threshold <= MIN_THRESHOLD + 2)
     {
         // blink the led 3 times
         for (int i = 0; i < 3; i++)
@@ -238,9 +250,9 @@ unsigned char set_threshold(void)
         }
 
         unsigned long start = millis();
-        // wait 60 seconds
-        while(millis() - start < 60000 ){
-            _threshold = get_ADC(THRESHOLD);
+        // wait 30 seconds
+        while(millis() - start < 30000 ){
+            _threshold = get_ADC(THRESHOLD) * (MAX_THRESHOLD - MIN_THRESHOLD) / 1023 + MIN_THRESHOLD;
 
             if (IR_triggered(IR1) || IR_triggered(IR2) || IR_triggered(IR3) || IR_triggered(IR4))
             {

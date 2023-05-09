@@ -1,5 +1,6 @@
 #pragma once
 
+
 #define TEST_LED PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
@@ -23,6 +24,8 @@
 #define US_3_ECHO PB7
 
 #define THRESHOLD PC5
+#define MAX_THRESHOLD 30
+#define MIN_THRESHOLD 5
 
 // value from 0 to 1023
 unsigned int _left_motor_speed;
@@ -96,8 +99,8 @@ void led(unsigned char state);
 // if IR3 is triggered turn left by 60 degrees
 // if IR4 is triggered turn right by 60 degrees
 // returns 1 if one of the IR sensors was triggered, 0 otherwise
-unsigned char check_leaving(void);
+unsigned char robot_leaving(void);
 
 // sets and returns the threshold using the potentiometer
-// if the potentiometer is turned all the way to the left, continuously set the threshold for 60 seconds
+// if the potentiometer is turned all the way to the left, continuously set the threshold for 30 seconds
 unsigned char set_threshold(void);
