@@ -1,6 +1,5 @@
 #pragma once
 
-#define IR_THRESHOLD 40 // the lower the number, the more sensitive the IR sensors are
 #define TEST_LED PB7
 
 #define LEFT_MOTOR_ENABLE OCR1A
@@ -23,8 +22,12 @@
 #define US_3_TRIGGER PB6
 #define US_3_ECHO PB7
 
+#define THRESHOLD PC5
+
+// value from 0 to 1023
 unsigned int _left_motor_speed;
 unsigned int _right_motor_speed;
+unsigned int _threshold;
 
 
 // sets pins to input or output and other initializations
@@ -42,19 +45,20 @@ unsigned char IR_triggered(IR);
 
 
 // returns the distance in cm from the given ultrasonic sensor
+// TODO: do an ADC to make sure its above the threshold instead of just doing a digital read because the threshold pot shares a pin with the echo pin
 typedef enum {
     US1 = 0,
     US2 = 1,
     US3 = 2,
 } US;
-unsigned int get_distance(US sensor);
+unsigned int get_US_distance(US sensor);
 
 
 // sets the global variables left_motor_speed and right_motor_speed to the given values
 void set_speed(unsigned int left_speed, unsigned int right_speed);
 
 
-// moves both wheels at the same speed. direction is defined by the DIRECTION enum, speed is from 0 to 255
+// moves both wheels at the same speed. direction is defined by the DIRECTION enum
 typedef enum {
     FORWARD = 0,
     BACKWARD = 1,
@@ -78,8 +82,8 @@ void brake(void);
 
 
 //moves the robot forward or backward at the given speed, with the given turn speed.
-//ccwTurnSpeed is from -255 to 255, with negative values turning the robot clockwise
-// forwardSpeed is from -255 to 255, with negative values moving the robot backward
+//ccwTurnSpeed is from -1023 to 1023, with negative values turning the robot clockwise
+// forwardSpeed is from -1023 to 1023, with negative values moving the robot backward
 void arc_move(int ccwTurnSpeed, int fowardSpeed);
 
 // turns the led on or off
@@ -93,3 +97,7 @@ void led(unsigned char state);
 // if IR4 is triggered turn right by 60 degrees
 // returns 1 if one of the IR sensors was triggered, 0 otherwise
 unsigned char check_leaving(void);
+
+// sets and returns the threshold using the potentiometer
+// if the potentiometer is turned all the way to the left, continuously set the threshold for 60 seconds
+unsigned char set_threshold(void);

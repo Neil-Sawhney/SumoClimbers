@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <utility.h>
 #include <util/delay.h>
+#include <util/atomic.h>
+#include <avr/interrupt.h>
 
 
 
@@ -59,11 +61,41 @@ void delay_ms(int ms){
 }
 
 
-int micros(void){
+ISR(TIMER1_COMPA_vect)
+{
+  timer1_millis++;
+}
 
-    int time = 0;
-    time = TCNT1;
-    time = time * 4;
-    return time;
+void init_millis(unsigned long f_cpu)
+{
+  unsigned long ctc_match_overflow;
 
+  ctc_match_overflow = ((f_cpu / 1000) / 8); //when timer1 is this value, 1ms has passed
+
+  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
+  TCCR1A |= (1 << WGM11);
+  TCCR1B |= (1 << WGM13) | (1 << WGM12);
+
+  // Set clock divisor to 8
+  TCCR1B |= (1 << CS11);
+
+  // high byte first, then low byte
+  OCR1AH = (ctc_match_overflow >> 8);
+  OCR1AL = ctc_match_overflow;
+
+  // Enable the compare match interrupt
+  TIMSK |= (1 << OCIE1A);
+
+  //REMEMBER TO ENABLE GLOBAL INTERRUPTS AFTER THIS WITH sei(); !!!
+}
+
+unsigned long millis (void)
+{
+  unsigned long millis_return;
+
+  // Ensure this cannot be disrupted
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    millis_return = timer1_millis;
+  }
+  return millis_return;
 }

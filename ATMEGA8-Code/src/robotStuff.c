@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <utility.h>
 #include <robotStuff.h>
 #include <util/delay.h>
@@ -13,17 +14,21 @@ void setup(void)
     TCCR1A |= (1 << WGM11) | (1 << WGM10);
     TCCR1B |= (1 << CS11) | (1 << WGM12);
 
+    init_millis(F_CPU);
+    sei();
+
+    // set the threshold using the potentiometer
+    set_threshold();
+
     // set initial motor speed to 0
-    _left_motor_speed = 0;
-    _right_motor_speed = 0;
-    LEFT_MOTOR_ENABLE = _left_motor_speed;
-    RIGHT_MOTOR_ENABLE = _right_motor_speed;
+    set_speed(0, 0);
+
 }
 
 unsigned char IR_triggered(IR ir_sensor)
 {
     unsigned int result = get_ADC(ir_sensor);
-    return (result > IR_THRESHOLD) ? 1 : 0;
+    return (result > _threshold) ? 1 : 0;
 }
 
 // create an array of arrays of unsigned chars
@@ -32,7 +37,7 @@ unsigned char US_pins[3][2] = {
     {US_2_TRIGGER, US_2_ECHO},
     {US_3_TRIGGER, US_3_ECHO},
 };
-unsigned int get_distance(US sensor)
+unsigned int get_US_distance(US sensor)
 {
     unsigned char trigger = US_pins[sensor][0];
     unsigned char echo = US_pins[sensor][1];
@@ -158,17 +163,17 @@ void arc_move(int ccwTurnSpeed, int forwardSpeed)
     int leftSpeed, rightSpeed;
     float scale;
 
-    ccwTurnSpeed = (ccwTurnSpeed > 255) ? 255 : ccwTurnSpeed;
-    ccwTurnSpeed = (ccwTurnSpeed < -255) ? -255 : ccwTurnSpeed;
-    forwardSpeed = (forwardSpeed > 255) ? 255 : forwardSpeed;
-    forwardSpeed = (forwardSpeed < -255) ? -255 : forwardSpeed;
+    ccwTurnSpeed = (ccwTurnSpeed > 1023) ? 1023 : ccwTurnSpeed;
+    ccwTurnSpeed = (ccwTurnSpeed < -1023) ? -1023 : ccwTurnSpeed;
+    forwardSpeed = (forwardSpeed > 1023) ? 1023 : forwardSpeed;
+    forwardSpeed = (forwardSpeed < -1023) ? -1023 : forwardSpeed;
 
     unsigned char direction = (forwardSpeed >= 0) ? FORWARD : BACKWARD;
 
-    // Calculate normalized speed if the sum exceeds 255
-    if (abs(forwardSpeed) + abs(ccwTurnSpeed) > 255)
+    // Calculate normalized speed if the sum exceeds 1023
+    if (abs(forwardSpeed) + abs(ccwTurnSpeed) > 1023)
     {
-        scale = 255.0f / (abs(forwardSpeed) + abs(ccwTurnSpeed));
+        scale = 1023.0f / (abs(forwardSpeed) + abs(ccwTurnSpeed));
         forwardSpeed *= scale;
         ccwTurnSpeed *= scale;
     }
@@ -176,9 +181,9 @@ void arc_move(int ccwTurnSpeed, int forwardSpeed)
     leftSpeed = forwardSpeed + ccwTurnSpeed / 2;
     rightSpeed = forwardSpeed - ccwTurnSpeed / 2;
 
-    leftSpeed = (leftSpeed > 255) ? 255 : (leftSpeed < -255) ? -255
+    leftSpeed = (leftSpeed > 1023) ? 1023 : (leftSpeed < -1023) ? -1023
                                                              : leftSpeed;
-    rightSpeed = (rightSpeed > 255) ? 255 : (rightSpeed < -255) ? -255
+    rightSpeed = (rightSpeed > 1023) ? 1023 : (rightSpeed < -1023) ? -1023
                                                                 : rightSpeed;
 
     set_speed(leftSpeed, rightSpeed);
@@ -192,48 +197,73 @@ void led(unsigned char value)
 
 unsigned char check_leaving(void)
 {
-    if (IR_triggered(IR1))
+    if (IR_triggered(IR1) || IR_triggered(IR2))
     {
-        led(1);
+        led(ON);
         brake();
-        move(BACKWARD);
-        delay_ms(700);
-        brake();
+        set_speed(1023, 1023);
         move(LEFT);
         delay_ms(700);
         brake();
+        led(OFF);
         return 1;
     }
-    if (IR_triggered(IR2))
+    if (IR_triggered(IR3) || IR_triggered(IR4))
     {
-        led(1);
-        brake();
-        move(BACKWARD);
-        delay_ms(700);
-        brake();
-        move(RIGHT);
-        delay_ms(700);
-        brake();
-        return 1;
-    }
-    if (IR_triggered(IR3))
-    {
-        led(1);
+        led(ON);
         set_speed(255, 255);
         move(RIGHT);
         delay_ms(700);
+        led(OFF);
         return 1;
     }
-    if (IR_triggered(IR4))
-    {
-        led(1);
-        set_speed(255, 255);
-        move(LEFT);
-        delay_ms(700);
-        return 1;
-    }
-    led(0);
     return 0;
     
     
+}
+
+unsigned char set_threshold(void)
+{
+    // get ADC from the potentiometer
+    _threshold = get_ADC(THRESHOLD);
+    if (_threshold < 1)
+    {
+        // blink the led 3 times
+        for (int i = 0; i < 3; i++)
+        {
+            led(ON);
+            delay_ms(200);
+            led(OFF);
+            delay_ms(200);
+        }
+
+        unsigned long start = millis();
+        // wait 60 seconds
+        while(millis() - start < 60000 ){
+            _threshold = get_ADC(THRESHOLD);
+
+            if (IR_triggered(IR1) || IR_triggered(IR2) || IR_triggered(IR3) || IR_triggered(IR4))
+            {
+                led(ON);
+            }
+            else
+            {
+                led(OFF);
+            }
+        }
+        led(OFF);
+
+        for (int i = 0; i < 3; i++)
+        {
+            led(ON);
+            delay_ms(200);
+            led(OFF);
+            delay_ms(200);
+        }
+
+
+    }
+
+    return _threshold;
+
 }
