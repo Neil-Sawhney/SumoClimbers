@@ -80,14 +80,14 @@ void set_speed(unsigned int left_speed, unsigned int right_speed)
 {
     _left_motor_speed = left_speed;
     _right_motor_speed = right_speed;
-}
-
-void move(DIRECTION dir)
-{
     // pwm for enable pins
     LEFT_MOTOR_ENABLE = _left_motor_speed;
     RIGHT_MOTOR_ENABLE = _right_motor_speed;
 
+}
+
+void move(DIRECTION dir)
+{
     switch (dir)
     {
     case BACKWARD:
@@ -209,75 +209,58 @@ void led(unsigned char value)
 
 unsigned char robot_leaving(void)
 {
-    if (IR_triggered(IR1) && IR_triggered(IR2) && !IR_triggered(IR3) && !IR_triggered(IR4))
-    {
-        led(ON);
-        escapeRight();
-        escapeRight();
-        led(OFF);
-        return 1;
+    unsigned char ir[5] = {0, 0, 0, 0, 0};
+    for (unsigned char i = 1; i< 5; i++){
+        ir[i] = IR_triggered(i-1);
     }
-    else if((IR_triggered(IR1) && !IR_triggered(IR2)) || (IR_triggered(IR1) && !IR_triggered(IR3) && IR_triggered(IR4)) || (!IR_triggered(IR2) && IR_triggered(IR3) && !IR_triggered(IR4)))
-    {
-        led(ON);
+
+    if(!(ir[1] || ir[2] || ir[3] || ir[4])){
+        return 0;
+    }
+
+    if(ir[1]){
         escapeLeft();
-        led(OFF);
         return 1;
     }
-    else if (IR_triggered(IR1) || IR_triggered(IR2) || IR_triggered(IR3) || IR_triggered(IR4))
-    {
-        led(ON);
-        escapeRight();
-        led(OFF);
-        return 1;
-    }
-    return 0;
+
+    escapeRight();
+    return 1;
     
 }
 
 void escapeLeft(void){
+        led(ON);
         brake();
-        // set_speed(1023, 1023);
-        //TODO: uncomment these to go full speed
         move(LEFT);
         delay_ms(700);
         move(FORWARD);
-        delay_ms(1000);
-        brake();
+        delay_ms(500);
+        led(OFF);
 }
 
 void escapeRight(void){
+        led(ON);
         brake();
-        // set_speed(1023, 1023);
-        //TODO: uncomment these to go full speed
         move(RIGHT);
         delay_ms(700);
         move(FORWARD);
-        delay_ms(1000);
-        brake();
+        delay_ms(500);
+        led(OFF);
 }
 
 unsigned char set_threshold(void)
 {
     // get ADC from the potentiometer
     // scale the result so that fully ccw is MIN_THRESHOLD and fully cw is MAX_THRESHOLD
-    _threshold = get_ADC(THRESHOLD) * (MAX_THRESHOLD - MIN_THRESHOLD) / 1023 + MIN_THRESHOLD;
+    _threshold = get_ADC(THRESHOLD);
 
-    if (_threshold <= MIN_THRESHOLD + 2)
+    if (_threshold <= 5)
     {
-        // blink the led 3 times
-        for (int i = 0; i < 3; i++)
-        {
-            led(ON);
-            delay_ms(200);
-            led(OFF);
-            delay_ms(200);
-        }
-
+        blink();
         unsigned long start = millis();
         // wait 30 seconds
         while(millis() - start < 30000 ){
-            _threshold = get_ADC(THRESHOLD) * (MAX_THRESHOLD - MIN_THRESHOLD) / 1023 + MIN_THRESHOLD;
+            _threshold = get_ADC(THRESHOLD);
 
             if (IR_triggered(IR1) || IR_triggered(IR2) || IR_triggered(IR3) || IR_triggered(IR4))
             {
@@ -290,17 +273,20 @@ unsigned char set_threshold(void)
         }
         led(OFF);
 
-        for (int i = 0; i < 3; i++)
-        {
-            led(ON);
-            delay_ms(200);
-            led(OFF);
-            delay_ms(200);
-        }
-
-
+        blink();
     }
 
     return _threshold;
 
+}
+
+void blink(void)
+{
+    for(int i = 0; i < 3; i++)
+    {
+        led(ON);
+        delay_ms(100);
+        led(OFF);
+        delay_ms(100);
+    }
 }

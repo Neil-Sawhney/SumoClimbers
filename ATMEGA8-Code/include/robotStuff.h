@@ -24,8 +24,6 @@
 #define US_3_ECHO PB7
 
 #define THRESHOLD PC5
-#define MAX_THRESHOLD 50
-#define MIN_THRESHOLD 5
 
 // value from 0 to 1023
 unsigned int _left_motor_speed;
@@ -108,3 +106,7 @@ void escapeLeft(void);
 // sets and returns the threshold using the potentiometer
 // if the potentiometer is turned all the way to the left, continuously set the threshold for 30 seconds
 unsigned char set_threshold(void);
+
+
+// blink the led
+void blink(void);

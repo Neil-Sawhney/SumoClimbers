@@ -9,11 +9,9 @@ int main()
     setup();
 
     set_speed(1023, 1023);
-    move(FORWARD);
     while (1) {
-        if(robot_leaving()){
-            move(FORWARD);
-        }
+        move(FORWARD);
+        robot_leaving();
     }
 
     return 0; // the program executed successfully
