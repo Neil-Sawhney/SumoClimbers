@@ -28,8 +28,19 @@ void setup(void)
 
 unsigned char IR_triggered(IR ir_sensor)
 {
-    unsigned int result = get_ADC(ir_sensor);
-    return (result > _threshold) ? 1 : 0;
+    unsigned long start = millis();
+    unsigned long count = 0;
+    // while its still in the 5ms range, count how many times the IR sensor is triggered
+    while (millis() - start < 5)
+    {
+        if (get_ADC(ir_sensor) > _threshold)
+        {
+            count++;
+        }
+    }
+
+
+    return (count > 2) ? 1 : 0;
 }
 
 // create an array of arrays of unsigned chars
@@ -198,9 +209,33 @@ void led(unsigned char value)
 
 unsigned char robot_leaving(void)
 {
-    if (IR_triggered(IR1) || IR_triggered(IR4))
+    if (IR_triggered(IR1) && IR_triggered(IR2) && !IR_triggered(IR3) && !IR_triggered(IR4))
     {
         led(ON);
+        escapeRight();
+        escapeRight();
+        led(OFF);
+        return 1;
+    }
+    else if((IR_triggered(IR1) && !IR_triggered(IR2)) || (IR_triggered(IR1) && !IR_triggered(IR3) && IR_triggered(IR4)) || (!IR_triggered(IR2) && IR_triggered(IR3) && !IR_triggered(IR4)))
+    {
+        led(ON);
+        escapeLeft();
+        led(OFF);
+        return 1;
+    }
+    else if (IR_triggered(IR1) || IR_triggered(IR2) || IR_triggered(IR3) || IR_triggered(IR4))
+    {
+        led(ON);
+        escapeRight();
+        led(OFF);
+        return 1;
+    }
+    return 0;
+    
+}
+
+void escapeLeft(void){
         brake();
         // set_speed(1023, 1023);
         //TODO: uncomment these to go full speed
@@ -209,12 +244,9 @@ unsigned char robot_leaving(void)
         move(FORWARD);
         delay_ms(1000);
         brake();
-        led(OFF);
-        return 1;
-    }
-    if (IR_triggered(IR2) || IR_triggered(IR3))
-    {
-        led(ON);
+}
+
+void escapeRight(void){
         brake();
         // set_speed(1023, 1023);
         //TODO: uncomment these to go full speed
@@ -223,12 +255,6 @@ unsigned char robot_leaving(void)
         move(FORWARD);
         delay_ms(1000);
         brake();
-        led(OFF);
-        return 1;
-    }
-    return 0;
-    
-    
 }
 
 unsigned char set_threshold(void)

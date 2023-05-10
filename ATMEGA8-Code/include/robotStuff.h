@@ -24,7 +24,7 @@
 #define US_3_ECHO PB7
 
 #define THRESHOLD PC5
-#define MAX_THRESHOLD 30
+#define MAX_THRESHOLD 50
 #define MIN_THRESHOLD 5
 
 // value from 0 to 1023
@@ -100,6 +100,10 @@ void led(unsigned char state);
 // if IR4 is triggered turn right by 60 degrees
 // returns 1 if one of the IR sensors was triggered, 0 otherwise
 unsigned char robot_leaving(void);
+
+// turns the robot if hits wall or gets pushed
+void escapeRight(void);
+void escapeLeft(void); 
 
 // sets and returns the threshold using the potentiometer
 // if the potentiometer is turned all the way to the left, continuously set the threshold for 30 seconds
